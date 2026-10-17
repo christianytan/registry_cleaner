@@ -1,4 +1,4 @@
-# Uninstall Registry Ghosts
+# Registry Cleaner
 
 *Find and remove the ghost entries left behind in the Windows Apps & Features
 (Uninstall) registry.*
@@ -13,8 +13,8 @@ entry is a leftover. Nothing is ever removed without you asking, and every
 removal writes a `.reg` backup first.
 
 ```
-target\release\uninstall-registry-ghosts.exe        # open the window
-target\release\uninstall-registry-ghosts.exe --cli  # same analysis, no window
+target\release\registry_cleaner.exe        # open the window
+target\release\registry_cleaner.exe --cli  # same analysis, no window
 ```
 
 418 KB executable, ~14 MB RAM at idle, no installer and no runtime needed.
@@ -62,7 +62,7 @@ missing, because they cannot be resolved reliably.
 - Nothing is deleted until you press a button, and a confirmation dialog lists
   exactly what is about to happen.
 - Every removal runs `reg export` first. Backups go to
-  `%TEMP%\uninstall-registry-ghosts\` and are restorable by double-clicking
+  `%TEMP%\registry_cleaner\` and are restorable by double-clicking
   them.
 - Deleting a key never touches program files.
 - `HKLM` keys need an elevated process. The status bar says when you are not
@@ -84,17 +84,12 @@ missing, because they cannot be resolved reliably.
 ### Command line
 
 ```
-uninstall-registry-ghosts.exe                     # GUI
-uninstall-registry-ghosts.exe --cli               # print ghosts + suspects to stdout
-uninstall-registry-ghosts.exe --cli --all         # include system components
-uninstall-registry-ghosts.exe --cli --csv out.csv # full machine-readable report
-uninstall-registry-ghosts.exe --selftest          # end-to-end check on a throwaway key
+registry_cleaner.exe                     # GUI
+registry_cleaner.exe --cli               # print ghosts + suspects to stdout
+registry_cleaner.exe --cli --all         # include system components
+registry_cleaner.exe --cli --csv out.csv # full machine-readable report
+registry_cleaner.exe --selftest          # end-to-end check on a throwaway key
 ```
-
-The binary is named after the thing it hunts, so the name is long on purpose.
-Nothing in the program depends on its own file name (`Restart as admin` re-reads
-`current_exe`), so if you use the CLI a lot, rename the copy on your `PATH` to
-something short - `ren uninstall-registry-ghosts.exe urg.exe` works fine.
 
 `--selftest` creates a temporary key under `HKCU`, confirms the scanner sees it
 and classifies it as a ghost, backs it up, deletes it, and confirms it is gone —
@@ -105,7 +100,7 @@ fails.
 ## Building
 
 ```
-cargo build --release   # -> target\release\uninstall-registry-ghosts.exe
+cargo build --release   # -> target\release\registry_cleaner.exe
 cargo test              # 18 unit tests for the parsing + classification rules
 ```
 

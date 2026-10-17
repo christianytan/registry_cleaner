@@ -1,5 +1,5 @@
-//! Uninstall Registry Ghosts - find and clean up the ghost entries that are
-//! left behind in Windows "Apps & Features" / "Installed apps".
+//! Registry Cleaner - find and clean up the ghost entries left behind in
+//! Windows "Apps & Features" / "Installed apps".
 //!
 //! The app never removes anything by itself: it ranks every uninstall registry
 //! key by how confident it is that the key is a leftover, explains *why*, and
@@ -18,7 +18,7 @@ use nwg::NativeUi;
 
 use scan::{Entry, Verdict};
 
-const TITLE: &str = "Uninstall Registry Ghosts - clean up Apps & Features";
+const TITLE: &str = "Registry Cleaner - clean up Apps & Features";
 
 const FILTERS: [&str; 6] = [
     "Ghost entries (definite)",
@@ -365,7 +365,7 @@ impl App {
 
     fn work_dir(&self) -> PathBuf {
         let mut dir = std::env::temp_dir();
-        dir.push("uninstall-registry-ghosts");
+        dir.push("registry_cleaner");
         dir
     }
 
@@ -598,7 +598,7 @@ impl App {
         };
         let dir = self.work_dir();
         let _ = std::fs::create_dir_all(&dir);
-        let file = dir.join("uninstall-registry-ghosts-report.csv");
+        let file = dir.join("registry_cleaner-report.csv");
         match std::fs::write(&file, csv) {
             Ok(()) => {
                 nwg::modal_info_message(
@@ -667,7 +667,7 @@ fn u(v: i32) -> u32 {
     }
 }
 
-/// Headless mode: `uninstall-registry-ghosts --cli [--all] [--csv <path>]`
+/// Headless mode: `registry_cleaner --cli [--all] [--csv <path>]`
 /// Same analysis as the window, so it can be scripted or checked by hand.
 fn run_cli(args: &[String]) {
     let show_all = args.iter().any(|a| a == "--all");
@@ -692,7 +692,7 @@ fn run_cli(args: &[String]) {
     }
 
     println!(
-        "Uninstall Registry Ghosts - {} uninstall keys read across 4 registry views",
+        "Registry Cleaner - {} uninstall keys read across 4 registry views",
         entries.len()
     );
     println!("  definite ghosts : {ghosts}");

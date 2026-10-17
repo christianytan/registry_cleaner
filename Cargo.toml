@@ -1,5 +1,5 @@
 [package]
-name = "uninstall-registry-ghosts"
+name = "registry_cleaner"
 version = "0.1.0"
 edition = "2021"
 description = "Find and remove the ghost entries left behind in the Windows Apps & Features (Uninstall) registry"
