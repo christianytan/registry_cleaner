@@ -1,4 +1,7 @@
-# AppCleaner
+# Uninstall Registry Ghosts
+
+*Find and remove the ghost entries left behind in the Windows Apps & Features
+(Uninstall) registry.*
 
 A small Windows tool for fixing the thing where **an app shows up in Apps &
 Features, you press Uninstall, and nothing happens** — because the app was
@@ -10,8 +13,8 @@ entry is a leftover. Nothing is ever removed without you asking, and every
 removal writes a `.reg` backup first.
 
 ```
-target\release\appcleaner.exe        # open the window
-target\release\appcleaner.exe --cli  # same analysis, no window
+target\release\uninstall-registry-ghosts.exe        # open the window
+target\release\uninstall-registry-ghosts.exe --cli  # same analysis, no window
 ```
 
 418 KB executable, ~14 MB RAM at idle, no installer and no runtime needed.
@@ -58,8 +61,9 @@ missing, because they cannot be resolved reliably.
 
 - Nothing is deleted until you press a button, and a confirmation dialog lists
   exactly what is about to happen.
-- Every removal runs `reg export` first. Backups go to `%TEMP%\AppCleaner\` and
-  are restorable by double-clicking them.
+- Every removal runs `reg export` first. Backups go to
+  `%TEMP%\uninstall-registry-ghosts\` and are restorable by double-clicking
+  them.
 - Deleting a key never touches program files.
 - `HKLM` keys need an elevated process. The status bar says when you are not
   elevated, and **Restart as admin** relaunches the app elevated.
@@ -80,12 +84,17 @@ missing, because they cannot be resolved reliably.
 ### Command line
 
 ```
-appcleaner.exe                     # GUI
-appcleaner.exe --cli               # print ghosts + suspects to stdout
-appcleaner.exe --cli --all         # include system components
-appcleaner.exe --cli --csv out.csv # full machine-readable report
-appcleaner.exe --selftest          # end-to-end check on a throwaway key
+uninstall-registry-ghosts.exe                     # GUI
+uninstall-registry-ghosts.exe --cli               # print ghosts + suspects to stdout
+uninstall-registry-ghosts.exe --cli --all         # include system components
+uninstall-registry-ghosts.exe --cli --csv out.csv # full machine-readable report
+uninstall-registry-ghosts.exe --selftest          # end-to-end check on a throwaway key
 ```
+
+The binary is named after the thing it hunts, so the name is long on purpose.
+Nothing in the program depends on its own file name (`Restart as admin` re-reads
+`current_exe`), so if you use the CLI a lot, rename the copy on your `PATH` to
+something short - `ren uninstall-registry-ghosts.exe urg.exe` works fine.
 
 `--selftest` creates a temporary key under `HKCU`, confirms the scanner sees it
 and classifies it as a ghost, backs it up, deletes it, and confirms it is gone —
@@ -96,7 +105,7 @@ fails.
 ## Building
 
 ```
-cargo build --release   # -> target\release\appcleaner.exe
+cargo build --release   # -> target\release\uninstall-registry-ghosts.exe
 cargo test              # 18 unit tests for the parsing + classification rules
 ```
 

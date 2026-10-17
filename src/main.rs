@@ -1,5 +1,5 @@
-//! AppCleaner - find and clean up the ghost entries that are left behind in
-//! Windows "Apps & Features" / "Installed apps".
+//! Uninstall Registry Ghosts - find and clean up the ghost entries that are
+//! left behind in Windows "Apps & Features" / "Installed apps".
 //!
 //! The app never removes anything by itself: it ranks every uninstall registry
 //! key by how confident it is that the key is a leftover, explains *why*, and
@@ -18,7 +18,7 @@ use nwg::NativeUi;
 
 use scan::{Entry, Verdict};
 
-const TITLE: &str = "AppCleaner - clean up Apps & Features";
+const TITLE: &str = "Uninstall Registry Ghosts - clean up Apps & Features";
 
 const FILTERS: [&str; 6] = [
     "Ghost entries (definite)",
@@ -41,13 +41,13 @@ const COLUMNS: [(&str, i32); 8] = [
 ];
 
 #[derive(Default, NwgUi)]
-pub struct AppCleaner {
+pub struct App {
     #[nwg_control(size: (1280, 820), position: (50, 40), title: TITLE,
                   flags: "WINDOW|VISIBLE|RESIZABLE|MAXIMIZE_BOX")]
     #[nwg_events(
-        OnInit: [AppCleaner::startup],
-        OnWindowClose: [AppCleaner::exit],
-        OnResize: [AppCleaner::relayout]
+        OnInit: [App::startup],
+        OnWindowClose: [App::exit],
+        OnResize: [App::relayout]
     )]
     window: nwg::Window,
 
@@ -56,19 +56,19 @@ pub struct AppCleaner {
 
     // ---- filters ----
     #[nwg_control(collection: FILTERS.to_vec(), selected_index: Some(0))]
-    #[nwg_events(OnComboxBoxSelection: [AppCleaner::refresh])]
+    #[nwg_events(OnComboxBoxSelection: [App::refresh])]
     filter: nwg::ComboBox<&'static str>,
 
     #[nwg_control(placeholder_text: Some("Search name, publisher or key..."))]
-    #[nwg_events(OnTextInput: [AppCleaner::refresh])]
+    #[nwg_events(OnTextInput: [App::refresh])]
     search: nwg::TextInput,
 
     #[nwg_control(text: "Include system components")]
-    #[nwg_events(OnButtonClick: [AppCleaner::refresh])]
+    #[nwg_events(OnButtonClick: [App::refresh])]
     show_system: nwg::CheckBox,
 
     #[nwg_control(text: "Rescan")]
-    #[nwg_events(OnButtonClick: [AppCleaner::rescan])]
+    #[nwg_events(OnButtonClick: [App::rescan])]
     btn_rescan: nwg::Button,
 
     // ---- main views ----
@@ -76,8 +76,8 @@ pub struct AppCleaner {
                   ex_flags: nwg::ListViewExFlags::GRID | nwg::ListViewExFlags::FULL_ROW_SELECT,
                   item_count: 800, focus: true)]
     #[nwg_events(
-        OnListViewItemChanged: [AppCleaner::on_select],
-        OnListViewDoubleClick: [AppCleaner::on_activate]
+        OnListViewItemChanged: [App::on_select],
+        OnListViewDoubleClick: [App::on_activate]
     )]
     list: nwg::ListView,
 
@@ -88,31 +88,31 @@ pub struct AppCleaner {
 
     // ---- actions ----
     #[nwg_control(text: "Remove selected")]
-    #[nwg_events(OnButtonClick: [AppCleaner::remove_selected])]
+    #[nwg_events(OnButtonClick: [App::remove_selected])]
     btn_remove: nwg::Button,
 
     #[nwg_control(text: "Remove all definite ghosts")]
-    #[nwg_events(OnButtonClick: [AppCleaner::remove_all_ghosts])]
+    #[nwg_events(OnButtonClick: [App::remove_all_ghosts])]
     btn_remove_all: nwg::Button,
 
     #[nwg_control(text: "Run real uninstaller")]
-    #[nwg_events(OnButtonClick: [AppCleaner::run_uninstaller])]
+    #[nwg_events(OnButtonClick: [App::run_uninstaller])]
     btn_uninstall: nwg::Button,
 
     #[nwg_control(text: "Open folder")]
-    #[nwg_events(OnButtonClick: [AppCleaner::open_folder])]
+    #[nwg_events(OnButtonClick: [App::open_folder])]
     btn_folder: nwg::Button,
 
     #[nwg_control(text: "Export report (.csv)")]
-    #[nwg_events(OnButtonClick: [AppCleaner::export_report])]
+    #[nwg_events(OnButtonClick: [App::export_report])]
     btn_export: nwg::Button,
 
     #[nwg_control(text: "Backup selected (.reg)")]
-    #[nwg_events(OnButtonClick: [AppCleaner::backup_selected])]
+    #[nwg_events(OnButtonClick: [App::backup_selected])]
     btn_backup: nwg::Button,
 
     #[nwg_control(text: "Restart as admin")]
-    #[nwg_events(OnButtonClick: [AppCleaner::relaunch_as_admin])]
+    #[nwg_events(OnButtonClick: [App::relaunch_as_admin])]
     btn_admin: nwg::Button,
 
     #[nwg_control(text: "Starting...")]
@@ -125,7 +125,7 @@ pub struct AppCleaner {
     busy: Cell<bool>,
 }
 
-impl AppCleaner {
+impl App {
     // ---------------------------------------------------------------- lifecycle
 
     fn startup(&self) {
@@ -365,7 +365,7 @@ impl AppCleaner {
 
     fn work_dir(&self) -> PathBuf {
         let mut dir = std::env::temp_dir();
-        dir.push("AppCleaner");
+        dir.push("uninstall-registry-ghosts");
         dir
     }
 
@@ -598,7 +598,7 @@ impl AppCleaner {
         };
         let dir = self.work_dir();
         let _ = std::fs::create_dir_all(&dir);
-        let file = dir.join("appcleaner-report.csv");
+        let file = dir.join("uninstall-registry-ghosts-report.csv");
         match std::fs::write(&file, csv) {
             Ok(()) => {
                 nwg::modal_info_message(
@@ -667,7 +667,7 @@ fn u(v: i32) -> u32 {
     }
 }
 
-/// Headless mode: `appcleaner --cli [--all] [--csv <path>]`
+/// Headless mode: `uninstall-registry-ghosts --cli [--all] [--csv <path>]`
 /// Same analysis as the window, so it can be scripted or checked by hand.
 fn run_cli(args: &[String]) {
     let show_all = args.iter().any(|a| a == "--all");
@@ -692,7 +692,7 @@ fn run_cli(args: &[String]) {
     }
 
     println!(
-        "AppCleaner - {} uninstall keys read across 4 registry views",
+        "Uninstall Registry Ghosts - {} uninstall keys read across 4 registry views",
         entries.len()
     );
     println!("  definite ghosts : {ghosts}");
@@ -770,7 +770,7 @@ fn main() {
     nwg::init().expect("Failed to initialize the Windows GUI");
     nwg::Font::set_global_family("Segoe UI").expect("Failed to load Segoe UI");
 
-    let _app = AppCleaner::build_ui(Default::default()).expect("Failed to build the UI");
+    let _app = App::build_ui(Default::default()).expect("Failed to build the UI");
 
     nwg::dispatch_thread_events();
 }

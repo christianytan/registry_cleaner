@@ -1,8 +1,8 @@
 [package]
-name = "appcleaner"
+name = "uninstall-registry-ghosts"
 version = "0.1.0"
 edition = "2021"
-description = "Find and clean orphaned / corrupted entries in the Windows Apps & Features (Uninstall) registry"
+description = "Find and remove the ghost entries left behind in the Windows Apps & Features (Uninstall) registry"
 
 [dependencies]
 native-windows-gui = { version = "1.0.13", default-features = false, features = [

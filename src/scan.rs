@@ -955,7 +955,7 @@ fn read_reg_file(path: &Path) -> Result<String, String> {
 /// This exercises the exact `reg.exe` calls the Remove buttons use, including a
 /// key name containing both spaces and braces.
 pub fn self_test() -> Result<String, String> {
-    const PROBE: &str = "AppCleaner selftest probe {1b2a3c4d-0000-4000-8000-000000000001}";
+    const PROBE: &str = "Uninstall Registry Ghosts selftest probe {1b2a3c4d-0000-4000-8000-000000000001}";
 
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let parent = hkcu
@@ -967,12 +967,12 @@ pub fn self_test() -> Result<String, String> {
         .map_err(|e| format!("could not create the probe key: {e}"))?
         .0;
     probe_key
-        .set_value("DisplayName", &"AppCleaner selftest probe")
+        .set_value("DisplayName", &"Uninstall Registry Ghosts selftest probe")
         .map_err(|e| format!("could not write DisplayName: {e}"))?;
     probe_key
         .set_value(
             "UninstallString",
-            &"\"C:\\AppCleaner-does-not-exist\\unins000.exe\" /SILENT",
+            &"\"C:\\uninstall-registry-ghosts-does-not-exist\\unins000.exe\" /SILENT",
         )
         .map_err(|e| format!("could not write UninstallString: {e}"))?;
     drop(probe_key);
@@ -995,7 +995,7 @@ pub fn self_test() -> Result<String, String> {
         // 2. the backup must be a real, restorable .reg file
         let dir = {
             let mut d = env::temp_dir();
-            d.push("AppCleaner-selftest");
+            d.push("uninstall-registry-ghosts-selftest");
             d
         };
         let backup = export_backup(&entry, &dir)?;
