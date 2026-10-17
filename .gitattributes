@@ -1,0 +1,14 @@
+# Normalise line endings in the repository so the project stays diffable
+# across Windows and non-Windows contributors.
+* text=auto eol=lf
+
+# Windows-only project: these are always LF in the repo and on disk.
+*.rs   text eol=lf
+*.toml text eol=lf
+*.md   text eol=lf
+*.gitignore text eol=lf
+
+# Anything genuinely binary.
+*.png  binary
+*.ico  binary
+*.exe  binary
